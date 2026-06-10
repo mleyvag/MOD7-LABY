@@ -33,7 +33,7 @@ else
   echo "🆕 Creating new Lambda function..."
   VERSION=$(aws lambda create-function \
     --function-name "$FUNCTION_NAME" \
-    --runtime nodejs20.x \
+    --runtime nodejs24.x \
     --handler src/index.handler \
     --role "$LAMBDA_ROLE_ARN" \
     --zip-file "fileb://${ZIP_FILE}" \
