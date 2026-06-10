@@ -32,20 +32,7 @@ for KEY_ID in $API_KEY_IDS; do
   fi
 done
 
-# ── Step 2: Delete Usage Plans ──
-echo "📌 Deleting Usage Plans 'plan-${SUFFIX}'..."
-PLAN_IDS=$(aws apigateway get-usage-plans --limit 500 \
-  --query "items[?name=='plan-${SUFFIX}'].id" \
-  --output text --no-cli-pager 2>/dev/null || echo "")
-
-for PLAN_ID in $PLAN_IDS; do
-  if [ -n "$PLAN_ID" ] && [ "$PLAN_ID" != "None" ]; then
-    echo "  Deleting Usage Plan: ${PLAN_ID}"
-    aws apigateway delete-usage-plan --usage-plan-id "$PLAN_ID" --no-cli-pager 2>/dev/null || true
-  fi
-done
-
-# ── Step 3: Delete API Gateways ──
+# ── Step 2: Delete API Gateways ──
 echo "📌 Deleting API Gateways '${API_NAME}'..."
 API_IDS=$(aws apigateway get-rest-apis --limit 500 \
   --query "items[?name=='${API_NAME}'].id" \
@@ -55,6 +42,21 @@ for API_ID in $API_IDS; do
   if [ -n "$API_ID" ] && [ "$API_ID" != "None" ]; then
     echo "  Deleting REST API: ${API_ID}"
     aws apigateway delete-rest-api --rest-api-id "$API_ID" --no-cli-pager 2>/dev/null || true
+  fi
+done
+
+sleep 2
+
+# ── Step 3: Delete Usage Plans ──
+echo "📌 Deleting Usage Plans 'plan-${SUFFIX}'..."
+PLAN_IDS=$(aws apigateway get-usage-plans --limit 500 \
+  --query "items[?name=='plan-${SUFFIX}'].id" \
+  --output text --no-cli-pager 2>/dev/null || echo "")
+
+for PLAN_ID in $PLAN_IDS; do
+  if [ -n "$PLAN_ID" ] && [ "$PLAN_ID" != "None" ]; then
+    echo "  Deleting Usage Plan: ${PLAN_ID}"
+    aws apigateway delete-usage-plan --usage-plan-id "$PLAN_ID" --no-cli-pager || true
   fi
 done
 
